@@ -22,8 +22,12 @@ import {
   IonCardContent,
   IonSelect,
   IonSelectOption,
-  IonInput
+  IonInput,
+  IonRange,
+  IonIcon
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { optionsOutline } from 'ionicons/icons';
 import { BikeType, bikePresets, getBikePreset } from './bike-presets';
 
 interface TrackPoint {
@@ -63,6 +67,18 @@ interface TimelinePoint {
   cumulativeDistanceMeters: number;
 }
 
+interface ParsedGpx {
+  points: TrackPoint[];
+  name: string | null;
+}
+interface PowerDistribution {
+  id: 'sedentary' | 'commuter' | 'recreational' | 'amateur' | 'pro';
+  label: string;
+  range: string;
+  min: number;
+  max?: number;
+}
+
 interface BikeFormModel {
   bikeType: BikeType;
   bikeWeightKg: number;
@@ -92,6 +108,13 @@ const MIN_SPEED_MPS = 0.5;
 const BIKE_FORM_STORAGE_KEY = 'velogiro-bike-form';
 const TIME_TICK_INTERVAL_SECONDS = 30 * 60;
 const MIN_GRAPH_WIDTH = 320;
+const POWER_DISTRIBUTIONS: PowerDistribution[] = [
+  { id: 'sedentary', label: 'Sedentary adult', range: '70–90 W', min: 70, max: 90 },
+  { id: 'commuter', label: 'Untrained commuter', range: '80–130 W', min: 80, max: 130 },
+  { id: 'recreational', label: 'Recreational cyclist', range: '150–200 W', min: 150, max: 200 },
+  { id: 'amateur', label: 'Trained amateur', range: '220–280 W', min: 220, max: 280 },
+  { id: 'pro', label: 'Pro', range: '300+ W', min: 300 }
+];
 
 @Component({
   selector: 'app-root',
@@ -110,6 +133,8 @@ const MIN_GRAPH_WIDTH = 320;
     IonSelect,
     IonSelectOption,
     IonInput,
+    IonRange,
+    IonIcon,
     RouterOutlet
   ],
   templateUrl: './app.html',
@@ -125,6 +150,11 @@ export class App implements AfterViewInit, OnDestroy {
   }));
   protected readonly bikeForm = signal<BikeFormModel>(createDefaultBikeForm());
   protected readonly graphWidth = signal(GRAPH_WIDTH);
+  protected readonly riderTypeLabel = computed(() => this.mapRiderType(this.bikeForm().avgWatts));
+  protected readonly gpxFileName = signal<string | null>(null);
+  protected readonly showCoefficientRow = signal(false);
+  protected readonly powerDistributions = POWER_DISTRIBUTIONS;
+  protected readonly selectedPowerDistribution = signal<'custom' | PowerDistribution['id']>('custom');
 
   @ViewChild('graphHost')
   private set graphHost(element: ElementRef<HTMLElement> | undefined) {
@@ -139,11 +169,15 @@ export class App implements AfterViewInit, OnDestroy {
   private resizeObserver?: ResizeObserver;
 
   constructor(private readonly ngZone: NgZone) {
+    addIcons({ 'options-outline': optionsOutline });
     const stored = this.loadBikeFormFromStorage();
     if (stored) {
       this.bikeForm.set(stored);
+      this.selectedPowerDistribution.set(this.getDistributionIdForWatts(stored.avgWatts));
     } else {
+      const initialWatts = this.bikeForm().avgWatts;
       this.persistBikeForm(this.bikeForm());
+      this.selectedPowerDistribution.set(this.getDistributionIdForWatts(initialWatts));
     }
   }
 
@@ -337,7 +371,8 @@ export class App implements AfterViewInit, OnDestroy {
 
     try {
       const text = await file.text();
-      const points = this.extractTrackPoints(text);
+      const parsed = this.extractTrackPoints(text);
+      const points = parsed.points;
 
       if (!points.length) {
         throw new Error('The GPX file does not contain any track points.');
@@ -345,10 +380,14 @@ export class App implements AfterViewInit, OnDestroy {
 
       this.trackPoints.set(points);
       this.parseError.set(null);
+      this.gpxFileName.set(parsed.name ?? file.name ?? null);
+      this.selectedPowerDistribution.set(this.getDistributionIdForWatts(this.bikeForm().avgWatts));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to parse GPX file.';
       this.parseError.set(message);
       this.trackPoints.set([]);
+      this.selectedPowerDistribution.set('custom');
+      this.gpxFileName.set(null);
     } finally {
       input.value = '';
     }
@@ -372,6 +411,9 @@ export class App implements AfterViewInit, OnDestroy {
     const rawValue = (event.detail as { value?: string | null })?.value ?? '';
     const parsed = parseFloat(rawValue);
     this.updateBikeForm(field, (Number.isNaN(parsed) ? 0 : parsed) as BikeFormModel[K]);
+    if (field === 'avgWatts') {
+      this.selectedPowerDistribution.set(this.getDistributionIdForWatts(this.bikeForm().avgWatts));
+    }
   }
 
   protected onBikeTypeChange(type: BikeType): void {
@@ -388,7 +430,29 @@ export class App implements AfterViewInit, OnDestroy {
     this.persistBikeForm(next);
   }
 
-  private extractTrackPoints(gpxText: string): TrackPoint[] {
+  protected toggleCoefficientRow(): void {
+    this.showCoefficientRow.update((value) => !value);
+  }
+
+  protected onPowerDistributionChange(value: PowerDistribution['id'] | 'custom' | null): void {
+    if (!value || value === 'custom') {
+      this.selectedPowerDistribution.set('custom');
+      return;
+    }
+
+    const profile = POWER_DISTRIBUTIONS.find((distribution) => distribution.id === value);
+    if (!profile) {
+      this.selectedPowerDistribution.set('custom');
+      return;
+    }
+
+    const target =
+      profile.max != null ? Math.round((profile.min + profile.max) / 2) : Math.round(profile.min);
+    this.selectedPowerDistribution.set(profile.id);
+    this.updateBikeForm('avgWatts', target);
+  }
+
+  private extractTrackPoints(gpxText: string): ParsedGpx {
     const parser = new DOMParser();
     const doc = parser.parseFromString(gpxText, 'application/xml');
 
@@ -400,7 +464,10 @@ export class App implements AfterViewInit, OnDestroy {
     const nodes = Array.from(doc.getElementsByTagName('trkpt'));
 
     if (!nodes.length) {
-      return trackPoints;
+      return {
+        points: trackPoints,
+        name: this.extractGpxName(doc)
+      };
     }
 
     let currentDistanceKm = 0;
@@ -431,7 +498,10 @@ export class App implements AfterViewInit, OnDestroy {
       previous = { lat, lon };
     }
 
-    return trackPoints;
+    return {
+      points: trackPoints,
+      name: this.extractGpxName(doc)
+    };
   }
 
   private haversineDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -628,6 +698,40 @@ export class App implements AfterViewInit, OnDestroy {
     return timeline[timeline.length - 1].cumulativeDistanceMeters;
   }
 
+  private extractGpxName(doc: Document): string | null {
+    const metadataName = doc.querySelector('metadata > name')?.textContent?.trim();
+    if (metadataName) {
+      return metadataName;
+    }
+
+    const trackName = doc.querySelector('trk > name')?.textContent?.trim();
+    return trackName || null;
+  }
+
+  private mapRiderType(avgWatts: number): string {
+    const profileId = this.getDistributionIdForWatts(avgWatts);
+    if (profileId === 'custom') {
+      return 'Custom rider';
+    }
+
+    const profile = POWER_DISTRIBUTIONS.find((distribution) => distribution.id === profileId);
+    return profile?.label ?? 'Custom rider';
+  }
+
+  private getDistributionIdForWatts(watts: number): PowerDistribution['id'] | 'custom' {
+    for (const profile of POWER_DISTRIBUTIONS) {
+      if (profile.max != null) {
+        if (watts <= profile.max) {
+          return profile.id;
+        }
+      } else {
+        return profile.id;
+      }
+    }
+
+    return 'custom';
+  }
+
   protected clampLabelPosition(position: number, width: number, margin = 12): number {
     if (position < margin) {
       return margin;
@@ -651,6 +755,7 @@ export class App implements AfterViewInit, OnDestroy {
 
     return 'middle';
   }
+
 
   private initializeResizeObserver(element: ElementRef<HTMLElement>): void {
     this.updateGraphWidth(element);

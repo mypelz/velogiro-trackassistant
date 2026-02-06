@@ -106,26 +106,99 @@ ion-card {
   align-items: flex-end;
 }
 
-.bike-form__row--presets .bike-form__field {
-  flex: 1 1 160px;
-}
-
-.bike-form__row--weights .bike-form__field {
+.bike-form__row--primary .bike-form__field {
   flex: 1 1 180px;
 }
 
-.bike-form__type {
+.bike-form__row--coeffs .bike-form__field {
+  flex: 1 1 160px;
+}
+
+.bike-form__row--power {
+  align-items: center;
+}
+
+.bike-form__row--power .bike-form__field {
+  flex: 1 1 200px;
+  max-width: 320px;
+}
+
+.bike-form__field--profile {
+  max-width: 360px;
+}
+
+.bike-form__type-select {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  flex: 1 1 200px;
+  flex: 1 1 180px;
   min-width: 200px;
 }
 
-.bike-form__arrow {
-  font-size: 0.9rem;
-  color: color-mix(in srgb, var(--ion-color-medium, #92949c) 70%, transparent);
-  line-height: 1;
+.bike-form__toggle {
+  position: relative;
+  border: none;
+  background: transparent;
+  color: var(--ion-color-medium, #92949c);
+  padding: 0.25rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.bike-form__toggle ion-icon {
+  font-size: 2rem;
+}
+
+.bike-form__toggle::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -0.5rem);
+  background: var(--ion-color-step-900, #1c1c1d);
+  color: #fff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.bike-form__toggle:hover::after,
+.bike-form__toggle:focus-visible::after {
+  opacity: 1;
+}
+
+.bike-form__toggle:hover,
+.bike-form__toggle:focus-visible {
+  color: var(--ion-color-primary);
+}
+
+.bike-form__rider-type-prefix {
+  color: var(--ion-color-step-900, #1c1c1d);
+  white-space: nowrap;
+}
+
+.bike-form__rider-type {
+  font-weight: 600;
+  color: var(--ion-color-step-900, #1c1c1d);
+  white-space: nowrap;
+}
+
+.bike-form__rider-context {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 200px;
+}
+
+.bike-form__rider-type-prefix {
+  font-size: 0.8rem;
+  color: var(--ion-color-medium, #92949c);
 }
 
 .bike-form__summary {
@@ -144,10 +217,17 @@ ion-card {
   gap: 1.5rem;
 }
 
+.graph-card__filename {
+  font-weight: 500;
+  color: var(--ion-color-medium, #92949c);
+  margin-left: 0.5rem;
+}
+
 .graph-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
+  align-items: center;
 }
 
 .meta-label {
@@ -172,9 +252,24 @@ ion-card {
 .meta-sub {
   font-size: 0.75rem;
   font-weight: 500;
-  margin-left: 0.25rem;
+  margin: 0 0.25rem 0 0;
   color: var(--ion-color-medium, #92949c);
 }
+
+.graph-meta__range {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.graph-meta__range ion-range {
+  width: 100%;
+  min-width: 100px;
+  max-width: 300px;
+  flex: 1 1 auto;
+}
+
 
 .graph-wrapper {
   width: 100%;

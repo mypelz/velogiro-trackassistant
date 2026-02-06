@@ -31,7 +31,7 @@
     "@angular/router": "^21.1.0",
     "@capacitor/core": "^8.0.2",
     "@ionic/angular": "^8.7.17",
-    "ionicons": "^8.0.13",
+    "ionicons": "^7.4.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
