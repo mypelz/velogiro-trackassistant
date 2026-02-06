@@ -1,50 +1,68 @@
 <ion-app>
   <ion-header translucent="true">
     <ion-toolbar color="primary">
+      <ion-buttons slot="start">
+        <ion-button fill="clear">
+          <img src="assets/velogiro.png" alt="Velogiro logo" class="app-title__logo" />
+        </ion-button>
+      </ion-buttons>
       <ion-title>Velogiro Trackassistant</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <ion-content [fullscreen]="true">
-    <section class="hero ion-padding">
-      <p class="hero__lead">
-        Upload a GPX file to inspect the ride profile. Track points are parsed locally and displayed in an SVG
-        chart inspired by Komoot's distance/elevation view.
-      </p>
-    </section>
-
-    <ion-card class="upload-card">
-          <ion-card-header>
+    <ion-grid class="content-grid">
+      <ion-row class="content-grid__row ion-align-items-stretch">
+        <ion-col size="12" sizeMd="6">
+          <ion-card class="upload-card">
+            <ion-card-header>
               <ion-card-title>Upload GPX Track</ion-card-title>
-          </ion-card-header>
-          <ion-card-content>
+            </ion-card-header>
+            <ion-card-content>
               <p>Load a <code>.gpx</code> file exported from your GPS computer or Komoot collection.</p>
               <label class="file-picker">
-                  <span>Select GPX file</span>
-                  <input type="file" accept=".gpx,application/gpx+xml" (change)="onFileSelected($event)" />
+                <span>Select GPX file</span>
+                <input type="file" accept=".gpx,application/gpx+xml" (change)="onFileSelected($event)" />
               </label>
 
               @if (parseError()) {
-                  <p class="status status--error">{{ parseError() }}</p>
+                <p class="status status--error">{{ parseError() }}</p>
               } @else {
-                  @if (trackProfile(); as profile) {
-                      <p class="status status--success">
-                          Loaded {{ profile.totalDistanceKm | number: '1.1-2' }} km ·
-                          Elevation {{ profile.minElevation | number: '1.0-0' }}–{{ profile.maxElevation | number: '1.0-0' }} m
-                      </p>
-                  } @else {
-                      <p class="status status--muted">GPX parsing is done entirely in-browser.</p>
-                  }
+                @if (trackProfile(); as profile) {
+                  <p class="status status--success">
+                    Loaded {{ profile.totalDistanceKm | number: '1.1-2' }} km ·
+                    Elevation {{ profile.minElevation | number: '1.0-0' }}–{{ profile.maxElevation | number: '1.0-0' }} m
+                  </p>
+                } @else {
+                  <p class="status status--muted">GPX parsing is done entirely in-browser.</p>
+                }
               }
-          </ion-card-content>
-      </ion-card>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+        <ion-col size="12" sizeMd="6">
+          <ion-card class="intro-card">
+            <ion-card-header>
+              <ion-card-title>Ride Insights</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p class="hero__lead">
+                Upload a GPX file to inspect the ride profile. Track points are parsed locally and displayed in an SVG
+                chart inspired by Komoot's distance/elevation view.
+              </p>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
 
-    <ion-card class="bike-form-card">
-      <ion-card-header>
-        <ion-card-title>Ride Setup</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="bike-form">
+      <ion-row class="content-grid__row">
+        <ion-col size="12">
+          <ion-card class="bike-form-card">
+            <ion-card-header>
+              <ion-card-title>Ride Setup</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="bike-form">
           <div class="bike-form__row bike-form__row--primary">
             <div class="bike-form__type-select">
               <ion-select
@@ -175,6 +193,11 @@
         </div>
       </ion-card-content>
     </ion-card>
+    </ion-col>
+      </ion-row>
+
+      <ion-row class="content-grid__row ion-align-items-stretch">
+        <ion-col size="12">
     <ion-card class="graph-card">
       <ion-card-header>
         <ion-card-title>
@@ -310,6 +333,9 @@
         </ion-card-content>
       }
     </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 
     <router-outlet />
   </ion-content>

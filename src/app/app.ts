@@ -26,8 +26,13 @@ import {
   IonSelect,
   IonSelectOption,
   IonInput,
-  IonRange,
-  IonIcon
+    IonRange,
+    IonIcon,
+    IonButtons,
+    IonButton,
+  IonGrid,
+  IonRow,
+  IonCol
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { optionsOutline } from 'ionicons/icons';
@@ -139,6 +144,11 @@ const POWER_DISTRIBUTIONS: PowerDistribution[] = [
     IonInput,
     IonRange,
     IonIcon,
+    IonButtons,
+    IonButton,
+    IonGrid,
+    IonRow,
+    IonCol,
     RouterOutlet
   ],
   templateUrl: './app.html',

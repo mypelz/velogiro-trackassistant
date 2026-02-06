@@ -2,6 +2,14 @@
   display: block;
 }
 
+.app-title__logo {
+  height: 42px;
+  width: 42px;
+  border-radius: 6px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
 ion-header {
   box-shadow: none;
 }
@@ -35,7 +43,19 @@ ion-header {
 }
 
 ion-card {
-  margin: 0 1rem 2rem;
+  margin: 0 0 2rem;
+}
+
+.content-grid {
+  padding: 0 1rem;
+}
+
+.content-grid__row {
+  margin-bottom: 1rem;
+}
+
+.content-grid ion-card {
+  height: 100%;
 }
 
 .upload-card p {
