@@ -37,6 +37,12 @@ import {
 import { addIcons } from 'ionicons';
 import { optionsOutline } from 'ionicons/icons';
 import { BikeType, bikePresets, getBikePreset } from './bike-presets';
+import {
+  POWER_DISTRIBUTIONS,
+  PowerDistribution,
+  getDistributionIdForWatts,
+  mapRiderType
+} from './utils/power';
 
 interface TrackPoint {
   lat: number;
@@ -79,14 +85,6 @@ interface ParsedGpx {
   points: TrackPoint[];
   name: string | null;
 }
-interface PowerDistribution {
-  id: 'sedentary' | 'commuter' | 'recreational' | 'amateur' | 'pro';
-  label: string;
-  range: string;
-  min: number;
-  max?: number;
-}
-
 interface BikeFormModel {
   bikeType: BikeType;
   bikeWeightKg: number;
@@ -117,14 +115,6 @@ const BIKE_FORM_STORAGE_KEY = 'velogiro-bike-form';
 const TIME_TICK_INTERVAL_SECONDS = 30 * 60;
 const MIN_GRAPH_WIDTH = 320;
 const DEFAULT_GPX_ASSET = 'assets/example-gpx-track.gpx';
-const POWER_DISTRIBUTIONS: PowerDistribution[] = [
-  { id: 'sedentary', label: 'Sedentary adult', range: '70–90 W', min: 70, max: 90 },
-  { id: 'commuter', label: 'Untrained commuter', range: '80–130 W', min: 80, max: 130 },
-  { id: 'recreational', label: 'Recreational cyclist', range: '150–200 W', min: 150, max: 200 },
-  { id: 'amateur', label: 'Trained amateur', range: '220–280 W', min: 220, max: 280 },
-  { id: 'pro', label: 'Pro', range: '300+ W', min: 300 }
-];
-
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -164,7 +154,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }));
   protected readonly bikeForm = signal<BikeFormModel>(createDefaultBikeForm());
   protected readonly graphWidth = signal(GRAPH_WIDTH);
-  protected readonly riderTypeLabel = computed(() => this.mapRiderType(this.bikeForm().avgWatts));
+  protected readonly riderTypeLabel = computed(() => mapRiderType(this.bikeForm().avgWatts));
   protected readonly gpxFileName = signal<string | null>(null);
   protected readonly showCoefficientRow = signal(false);
   protected readonly powerDistributions = POWER_DISTRIBUTIONS;
@@ -194,11 +184,11 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     const stored = this.loadBikeFormFromStorage();
     if (stored) {
       this.bikeForm.set(stored);
-      this.selectedPowerDistribution.set(this.getDistributionIdForWatts(stored.avgWatts));
+      this.selectedPowerDistribution.set(getDistributionIdForWatts(stored.avgWatts));
     } else {
       const initialWatts = this.bikeForm().avgWatts;
       this.persistBikeForm(this.bikeForm());
-      this.selectedPowerDistribution.set(this.getDistributionIdForWatts(initialWatts));
+      this.selectedPowerDistribution.set(getDistributionIdForWatts(initialWatts));
     }
   }
 
@@ -429,7 +419,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     const parsed = parseFloat(rawValue);
     this.updateBikeForm(field, (Number.isNaN(parsed) ? 0 : parsed) as BikeFormModel[K]);
     if (field === 'avgWatts') {
-      this.selectedPowerDistribution.set(this.getDistributionIdForWatts(this.bikeForm().avgWatts));
+      this.selectedPowerDistribution.set(getDistributionIdForWatts(this.bikeForm().avgWatts));
     }
   }
 
@@ -736,7 +726,7 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     this.trackPoints.set(points);
     this.parseError.set(null);
     this.gpxFileName.set(parsed.name ?? fallbackName ?? null);
-    this.selectedPowerDistribution.set(this.getDistributionIdForWatts(this.bikeForm().avgWatts));
+    this.selectedPowerDistribution.set(getDistributionIdForWatts(this.bikeForm().avgWatts));
   }
 
   private async loadDefaultGpxTrack(): Promise<void> {
@@ -760,29 +750,6 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private mapRiderType(avgWatts: number): string {
-    const profileId = this.getDistributionIdForWatts(avgWatts);
-    if (profileId === 'custom') {
-      return 'Custom rider';
-    }
-
-    const profile = POWER_DISTRIBUTIONS.find((distribution) => distribution.id === profileId);
-    return profile?.label ?? 'Custom rider';
-  }
-
-  private getDistributionIdForWatts(watts: number): PowerDistribution['id'] | 'custom' {
-    for (const profile of POWER_DISTRIBUTIONS) {
-      if (profile.max != null) {
-        if (watts <= profile.max) {
-          return profile.id;
-        }
-      } else {
-        return profile.id;
-      }
-    }
-
-    return 'custom';
-  }
 
   protected clampLabelPosition(position: number, width: number, margin = 12): number {
     if (position < margin) {
