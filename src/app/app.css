@@ -44,10 +44,11 @@ ion-header {
 
 ion-card {
   margin: 0 0 2rem;
+  --padding-bottom: 0;
 }
 
 .content-grid {
-  padding: 0 1rem;
+  padding: 1rem;
 }
 
 .content-grid__row {
@@ -194,29 +195,6 @@ ion-card {
   color: var(--ion-color-primary);
 }
 
-.bike-form__rider-type-prefix {
-  color: var(--ion-color-step-900, #1c1c1d);
-  white-space: nowrap;
-}
-
-.bike-form__rider-type {
-  font-weight: 600;
-  color: var(--ion-color-step-900, #1c1c1d);
-  white-space: nowrap;
-}
-
-.bike-form__rider-context {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  flex: 1 1 180px;
-  min-width: 180px;
-}
-
-.bike-form__rider-type-prefix {
-  font-size: 0.8rem;
-  color: var(--ion-color-medium, #92949c);
-}
 
 .bike-form__summary {
   margin: 0;

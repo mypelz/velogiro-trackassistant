@@ -13,7 +13,7 @@
   <ion-content [fullscreen]="true">
     <ion-grid class="content-grid">
       <ion-row class="content-grid__row ion-align-items-stretch">
-        <ion-col size="12" sizeMd="6">
+        <ion-col size="12" sizeMd="4">
           <ion-card class="upload-card">
             <ion-card-header>
               <ion-card-title>Upload GPX Track</ion-card-title>
@@ -40,15 +40,27 @@
             </ion-card-content>
           </ion-card>
         </ion-col>
-        <ion-col size="12" sizeMd="6">
+        <ion-col size="12" sizeMd="8">
           <ion-card class="intro-card">
             <ion-card-header>
-              <ion-card-title>Ride Insights</ion-card-title>
+              <ion-card-title>Predict Your Ride with Power-Perfect Precision</ion-card-title>
             </ion-card-header>
             <ion-card-content>
               <p class="hero__lead">
-                Upload a GPX file to inspect the ride profile. Track points are parsed locally and displayed in an SVG
-                chart inspired by Komoot's distance/elevation view.
+                  Transform any GPX track into an accurate speed forecast. Import your route from Komoot or any GPS app, input your average power output, and get a realistic velocity prediction that accounts for every climb, descent, and flat stretch.</p>
+            <p class="hero__lead">Your ride, calculated down to the watt:            </p>
+            <ul>
+                <li>Analyzes elevation profiles and distance from your GPX data</li>
+                <li>Factors in your bike type, total weight (gear, cargo, and all), and body weight</li>
+                <li>Calculates precise speed estimates based on your sustainable power output</li>
+                <li>No more guessing—know your pace before you pedal</li>
+            </ul>
+
+
+
+
+
+                <p class="hero__lead">Whether you're planning a bikepacking adventure, training for an event, or just curious how fast you'll actually go on that mountain pass, get the answer in watts and kilometers per hour.
               </p>
             </ion-card-content>
           </ion-card>
@@ -185,10 +197,6 @@
                 </ion-select-option>
               }
             </ion-select>
-            <div class="bike-form__rider-context">
-              <span class="bike-form__rider-type-prefix">Profile aligns with</span>
-              <span class="bike-form__rider-type">{{ riderTypeLabel() }}</span>
-            </div>
           </div>
         </div>
       </ion-card-content>
@@ -231,6 +239,10 @@
               } @else {
                 <span class="meta-value meta-value--muted">Upload GPX to estimate time</span>
               }
+            </div>
+            <div>
+              <span class="meta-label">Profile aligns with</span>
+              <span class="meta-value">{{ riderTypeLabel() }}</span>
             </div>
             <div class="graph-meta__range">
               <ion-range
