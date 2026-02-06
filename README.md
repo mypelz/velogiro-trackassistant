@@ -1,4 +1,4 @@
-# Velogiro Trackassistant
+# Velogiro - Power-Based Speed Prediction
 
 **Predict Your Ride with Power-Perfect Precision**
 

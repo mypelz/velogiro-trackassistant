@@ -6,7 +6,7 @@
           <img src="assets/velogiro_3.png" alt="Velogiro logo" class="app-title__logo" />
         </ion-button>
       </ion-buttons>
-      <ion-title>Velogiro Trackassistant</ion-title>
+        <ion-title><strong>Velogiro</strong> | Power-Based Speed Prediction</ion-title>
     </ion-toolbar>
   </ion-header>
 
@@ -30,8 +30,14 @@
               } @else {
                 @if (trackProfile(); as profile) {
                   <p class="status status--success">
-                    Loaded {{ profile.totalDistanceKm | number: '1.1-2' }} km ·
-                    Elevation {{ profile.minElevation | number: '1.0-0' }}–{{ profile.maxElevation | number: '1.0-0' }} m
+                    Loaded
+                    {{
+                      profile.totalDistanceKm | number: '1.1-2':'de-DE'
+                    }} km ·
+                Elevation
+                    {{ profile.minElevation | number: '1.0-0':'de-DE' }}–{{
+                      profile.maxElevation | number: '1.0-0':'de-DE'
+                    }} m
                   </p>
                 } @else {
                   <p class="status status--muted">GPX parsing is done entirely in-browser.</p>
@@ -217,12 +223,16 @@
           <div class="graph-meta">
             <div>
               <span class="meta-label">Distance</span>
-              <span class="meta-value">{{ profile.totalDistanceKm | number: '1.2-2' }} km</span>
+              <span class="meta-value">
+                {{ profile.totalDistanceKm | number: '1.2-2':'de-DE' }} km
+              </span>
             </div>
             <div>
               <span class="meta-label">Elevation</span>
               <span class="meta-value">
-                {{ profile.minElevation | number: '1.0-0' }} – {{ profile.maxElevation | number: '1.0-0' }} m
+                {{ profile.minElevation | number: '1.0-0':'de-DE' }} – {{
+                  profile.maxElevation | number: '1.0-0':'de-DE'
+                }} m
               </span>
             </div>
             <div>
@@ -231,7 +241,9 @@
                 <span class="meta-value">
                   {{ estimate.formatted }}
                   <span class="meta-sub">at</span>
-                  <span class="meta-value">{{ bikeForm().avgWatts | number: '1.0-0' }} W</span>
+                  <span class="meta-value">
+                    {{ bikeForm().avgWatts | number: '1.0-0':'de-DE' }} W
+                  </span>
                 </span>
               } @else {
                 <span class="meta-value meta-value--muted">Upload GPX to estimate time</span>
@@ -298,7 +310,7 @@
                   [attr.y2]="tick.position"
                 />
                 <text class="axis-label axis-label--horizontal" x="0" [attr.y]="tick.position - 4">
-                  {{ tick.value | number: '1.0-0' }} m
+                  {{ tick.value | number: '1.0-0':'de-DE' }} m
                 </text>
               }
               @for (tick of profile.distanceTicks; track tick.value) {
@@ -315,7 +327,7 @@
                   [attr.y]="profile.graphHeight - 4"
                   [attr.text-anchor]="labelAnchor(tick.position, profile.graphWidth)"
                 >
-                  {{ tick.value | number: '1.0-0' }} km
+                  {{ tick.value | number: '1.0-0':'de-DE' }} km
                 </text>
               }
               <line
@@ -328,10 +340,10 @@
               <path class="graph-fill" [attr.d]="profile.fillPath" />
               <path class="graph-line" [attr.d]="profile.linePath" />
               <text class="axis-label axis-label--top" x="0" y="18">
-                {{ profile.maxElevation | number: '1.0-0' }} m
+                {{ profile.maxElevation | number: '1.0-0':'de-DE' }} m
               </text>
               <text class="axis-label axis-label--bottom" x="0" [attr.y]="profile.graphHeight - 12">
-                {{ profile.minElevation | number: '1.0-0' }} m
+                {{ profile.minElevation | number: '1.0-0':'de-DE' }} m
               </text>
             </svg>
           </div>
@@ -347,5 +359,13 @@
     </ion-grid>
 
     <router-outlet />
+    <footer class="app-footer">
+      <span>
+        <a href="https://github.com/mypelz/velogiro-trackassistant" target="_blank" rel="noopener"
+          >GitHub</a
+        >
+        · see README for license
+      </span>
+    </footer>
   </ion-content>
 </ion-app>
