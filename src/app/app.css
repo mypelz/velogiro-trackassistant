@@ -1,0 +1,241 @@
+:host {
+  display: block;
+}
+
+ion-header {
+  box-shadow: none;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+}
+
+.hero__eyebrow {
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--ion-color-secondary);
+  margin: 0;
+}
+
+.hero__lead {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ion-color-step-600, #4c4e5d);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+ion-card {
+  margin: 0 1rem 2rem;
+}
+
+.upload-card p {
+  margin-top: 0.5rem;
+  color: var(--ion-color-step-600, #4c4e5d);
+}
+
+.file-picker {
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px dashed var(--ion-color-medium, #92949c);
+  border-radius: 999px;
+  color: var(--ion-color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.file-picker:hover {
+  border-color: var(--ion-color-primary);
+  background: color-mix(in srgb, var(--ion-color-primary) 8%, transparent);
+}
+
+.file-picker input {
+  display: none;
+}
+
+.status {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.status--error {
+  color: var(--ion-color-danger, #eb445a);
+}
+
+.status--success {
+  color: var(--ion-color-success, #2dd36f);
+}
+
+.status--muted {
+  color: var(--ion-color-medium, #92949c);
+}
+
+.bike-form-card ion-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bike-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bike-form__field {
+  width: 100%;
+}
+
+.bike-form__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.bike-form__row--presets .bike-form__field {
+  flex: 1 1 160px;
+}
+
+.bike-form__row--weights .bike-form__field {
+  flex: 1 1 180px;
+}
+
+.bike-form__type {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+
+.bike-form__arrow {
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--ion-color-medium, #92949c) 70%, transparent);
+  line-height: 1;
+}
+
+.bike-form__summary {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ion-color-step-600, #4c4e5d);
+}
+
+.bike-form__summary strong {
+  color: var(--ion-color-step-900, #1c1c1d);
+}
+
+.graph-card ion-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.graph-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.meta-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ion-color-medium, #92949c);
+}
+
+.meta-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ion-color-step-900, #1c1c1d);
+}
+
+.meta-value--muted {
+  color: var(--ion-color-medium, #92949c);
+  font-weight: 500;
+}
+
+.meta-sub {
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-left: 0.25rem;
+  color: var(--ion-color-medium, #92949c);
+}
+
+.graph-wrapper {
+  width: 100%;
+}
+
+.profile-graph {
+  width: 100%;
+  height: 400px;
+}
+
+.graph-bg {
+  fill: color-mix(in srgb, var(--ion-color-primary) 6%, transparent);
+}
+
+.graph-fill {
+  fill: url(#gradientElevation);
+  fill-opacity: 0.7;
+}
+
+.graph-line {
+  fill: none;
+  stroke: var(--ion-color-primary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.graph-axis {
+  stroke: var(--ion-color-medium, #92949c);
+  stroke-dasharray: 6 6;
+}
+
+.axis-label {
+  font-size: 0.75rem;
+  fill: var(--ion-color-medium, #92949c);
+}
+
+.graph-grid {
+  stroke: color-mix(in srgb, var(--ion-color-medium) 75%, transparent);
+  stroke-width: 1;
+  opacity: 0.5;
+}
+
+.graph-grid--vertical {
+  stroke-dasharray: 4 6;
+}
+
+.graph-grid--horizontal {
+  stroke-dasharray: 6 6;
+}
+
+.axis-label--horizontal {
+  dominant-baseline: hanging;
+}
+
+.axis-label--distance {
+  text-anchor: middle;
+}
+
+.graph-time-line {
+  stroke: var(--ion-color-success, #2dd36f);
+  stroke-width: 1;
+  opacity: 0.75;
+}
