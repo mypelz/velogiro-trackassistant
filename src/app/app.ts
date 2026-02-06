@@ -1,10 +1,13 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
   AfterViewInit,
   Component,
   ElementRef,
+  Inject,
   NgZone,
   OnDestroy,
+  OnInit,
+  PLATFORM_ID,
   ViewChild,
   computed,
   signal
@@ -108,6 +111,7 @@ const MIN_SPEED_MPS = 0.5;
 const BIKE_FORM_STORAGE_KEY = 'velogiro-bike-form';
 const TIME_TICK_INTERVAL_SECONDS = 30 * 60;
 const MIN_GRAPH_WIDTH = 320;
+const DEFAULT_GPX_ASSET = '/assets/example-gpx-track.gpx';
 const POWER_DISTRIBUTIONS: PowerDistribution[] = [
   { id: 'sedentary', label: 'Sedentary adult', range: '70–90 W', min: 70, max: 90 },
   { id: 'commuter', label: 'Untrained commuter', range: '80–130 W', min: 80, max: 130 },
@@ -140,7 +144,7 @@ const POWER_DISTRIBUTIONS: PowerDistribution[] = [
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App implements AfterViewInit, OnDestroy {
+export class App implements OnInit, AfterViewInit, OnDestroy {
   protected readonly title = signal('velogiro-trackassistant');
   protected readonly trackPoints = signal<TrackPoint[]>([]);
   protected readonly parseError = signal<string | null>(null);
@@ -168,7 +172,14 @@ export class App implements AfterViewInit, OnDestroy {
   private graphHostElement?: ElementRef<HTMLElement>;
   private resizeObserver?: ResizeObserver;
 
-  constructor(private readonly ngZone: NgZone) {
+  private readonly isBrowser: boolean;
+
+  constructor(
+    @Inject(PLATFORM_ID) platformId: Object,
+    @Inject(DOCUMENT) private readonly document: Document,
+    private readonly ngZone: NgZone
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
     addIcons({ 'options-outline': optionsOutline });
     const stored = this.loadBikeFormFromStorage();
     if (stored) {
@@ -178,6 +189,12 @@ export class App implements AfterViewInit, OnDestroy {
       const initialWatts = this.bikeForm().avgWatts;
       this.persistBikeForm(this.bikeForm());
       this.selectedPowerDistribution.set(this.getDistributionIdForWatts(initialWatts));
+    }
+  }
+
+  public async ngOnInit(): Promise<void> {
+    if (this.isBrowser && this.trackPoints().length === 0) {
+      await this.loadDefaultGpxTrack();
     }
   }
 
@@ -371,17 +388,7 @@ export class App implements AfterViewInit, OnDestroy {
 
     try {
       const text = await file.text();
-      const parsed = this.extractTrackPoints(text);
-      const points = parsed.points;
-
-      if (!points.length) {
-        throw new Error('The GPX file does not contain any track points.');
-      }
-
-      this.trackPoints.set(points);
-      this.parseError.set(null);
-      this.gpxFileName.set(parsed.name ?? file.name ?? null);
-      this.selectedPowerDistribution.set(this.getDistributionIdForWatts(this.bikeForm().avgWatts));
+      this.applyParsedTrack(text, file.name ?? undefined);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to parse GPX file.';
       this.parseError.set(message);
@@ -706,6 +713,39 @@ export class App implements AfterViewInit, OnDestroy {
 
     const trackName = doc.querySelector('trk > name')?.textContent?.trim();
     return trackName || null;
+  }
+
+  private applyParsedTrack(gpxText: string, fallbackName?: string): void {
+    const parsed = this.extractTrackPoints(gpxText);
+    const points = parsed.points;
+
+    if (!points.length) {
+      throw new Error('The GPX file does not contain any track points.');
+    }
+
+    this.trackPoints.set(points);
+    this.parseError.set(null);
+    this.gpxFileName.set(parsed.name ?? fallbackName ?? null);
+    this.selectedPowerDistribution.set(this.getDistributionIdForWatts(this.bikeForm().avgWatts));
+  }
+
+  private async loadDefaultGpxTrack(): Promise<void> {
+    if (!this.isBrowser) {
+      return;
+    }
+
+    try {
+      const assetUrl = new URL(DEFAULT_GPX_ASSET, this.document.baseURI).toString();
+      const response = await fetch(assetUrl);
+      if (!response.ok) {
+        throw new Error('Failed to load default GPX asset.');
+      }
+
+      const text = await response.text();
+      this.applyParsedTrack(text, 'Example GPX Track');
+    } catch (error) {
+      console.warn('Unable to load example GPX track.', error);
+    }
   }
 
   private mapRiderType(avgWatts: number): string {
