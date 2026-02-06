@@ -116,7 +116,7 @@ const MIN_SPEED_MPS = 0.5;
 const BIKE_FORM_STORAGE_KEY = 'velogiro-bike-form';
 const TIME_TICK_INTERVAL_SECONDS = 30 * 60;
 const MIN_GRAPH_WIDTH = 320;
-const DEFAULT_GPX_ASSET = '/assets/example-gpx-track.gpx';
+const DEFAULT_GPX_ASSET = 'assets/example-gpx-track.gpx';
 const POWER_DISTRIBUTIONS: PowerDistribution[] = [
   { id: 'sedentary', label: 'Sedentary adult', range: '70–90 W', min: 70, max: 90 },
   { id: 'commuter', label: 'Untrained commuter', range: '80–130 W', min: 80, max: 130 },
@@ -745,7 +745,9 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
     }
 
     try {
-      const assetUrl = new URL(DEFAULT_GPX_ASSET, this.document.baseURI).toString();
+      const baseHref = this.document.querySelector('base')?.getAttribute('href') ?? '/';
+      const baseUrl = new URL(baseHref, this.document.location.origin);
+      const assetUrl = new URL(DEFAULT_GPX_ASSET, baseUrl).toString();
       const response = await fetch(assetUrl);
       if (!response.ok) {
         throw new Error('Failed to load default GPX asset.');
