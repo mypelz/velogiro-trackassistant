@@ -7,11 +7,11 @@ export interface PowerDistribution {
 }
 
 export const POWER_DISTRIBUTIONS: PowerDistribution[] = [
-  { id: 'sedentary', label: '"no sports" adult', range: '70–90 W', min: 70, max: 90 },
-  { id: 'commuter', label: 'Untrained commuter', range: '80–130 W', min: 80, max: 130 },
-  { id: 'recreational', label: 'Recreational cyclist', range: '150–200 W', min: 150, max: 200 },
-  { id: 'amateur', label: 'Trained amateur', range: '220–280 W', min: 220, max: 280 },
-  { id: 'pro', label: 'Pro', range: '300+ W', min: 300 }
+  { id: 'sedentary', label: '"no sports" adult', range: '50–80 W', min: 50, max: 79 },
+  { id: 'commuter', label: 'Untrained commuter', range: '80–120 W', min: 80, max: 119 },
+  { id: 'recreational', label: 'Recreational cyclist', range: '120–180 W', min: 120, max: 179 },
+  { id: 'amateur', label: 'Trained amateur', range: '180–280 W', min: 180, max: 279 },
+  { id: 'pro', label: 'Pro', range: '280+ W', min: 279 }
 ];
 
 export function getDistributionIdForWatts(watts: number): PowerDistribution['id'] | 'custom' {
