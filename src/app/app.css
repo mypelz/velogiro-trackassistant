@@ -288,10 +288,13 @@ ion-card {
 
 .graph-wrapper {
   width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .profile-graph {
-  width: 100%;
+  display: block;
   height: 400px;
 }
 

@@ -114,6 +114,9 @@ const MIN_SPEED_MPS = 0.5;
 const BIKE_FORM_STORAGE_KEY = 'velogiro-bike-form';
 const TIME_TICK_INTERVAL_SECONDS = 30 * 60;
 const MIN_GRAPH_WIDTH = 320;
+const MIN_SCROLLABLE_GRAPH_WIDTH = 640;
+const MAX_SCROLLABLE_GRAPH_WIDTH = 920;
+const GRAPH_PIXELS_PER_KM = 80;
 const DEFAULT_GPX_ASSET = 'assets/example-gpx-track.gpx';
 @Component({
   selector: 'app-root',
@@ -209,13 +212,25 @@ export class App implements OnInit, AfterViewInit, OnDestroy {
   }
 
   protected readonly trackProfile = computed<TrackProfile | null>(() => {
-    const width = Math.max(this.graphWidth(), MIN_GRAPH_WIDTH);
     const points = this.trackPoints();
     if (!points.length) {
       return null;
     }
 
     const totalDistanceKm = points[points.length - 1].distanceKm;
+    const containerWidth = Math.max(this.graphWidth(), MIN_GRAPH_WIDTH);
+    const width =
+      containerWidth > MAX_SCROLLABLE_GRAPH_WIDTH
+        ? containerWidth
+        : Math.min(
+            Math.max(
+              containerWidth,
+              Math.round(totalDistanceKm * GRAPH_PIXELS_PER_KM),
+              MIN_SCROLLABLE_GRAPH_WIDTH,
+              MIN_GRAPH_WIDTH
+            ),
+            MAX_SCROLLABLE_GRAPH_WIDTH
+          );
     const elevations = points.map((point) => point.elevation);
     const minElevation = Math.min(...elevations);
     const maxElevation = Math.max(...elevations);
